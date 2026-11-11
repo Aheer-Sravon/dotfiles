@@ -80,3 +80,9 @@ yt-dlp -f "bv*[vcodec^=avc1]+ba[ext=m4a]/b[ext=mp4]" -S "vcodec:h264,res,acodec:
 ```Bash
 nvim --cmd "redir! > nvim_error.txt" your_file.lua +q
 ```
+
+# Watch TV in MPV
+
+```Bash
+mpv https://iptv-org.github.io/iptv/index.m3u
+```

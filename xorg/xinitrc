@@ -7,4 +7,9 @@ xrdb -merge ~/.Xresources
 dunst &
 slstatus &
 
+# Configure the XDG desktop portal environment for dwm
+export XDG_CURRENT_DESKTOP=dwm
+systemctl --user import-environment DISPLAY XDG_CURRENT_DESKTOP
+dbus-update-activation-environment --systemd DISPLAY XDG_CURRENT_DESKTOP
+
 exec dwm

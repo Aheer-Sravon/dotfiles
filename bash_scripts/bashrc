@@ -135,3 +135,48 @@ screen_record() {
         -b:a 128k \
         "$output_file"
 }
+
+calculate() {
+    local expression="$*"
+
+    if ! command -v bc >/dev/null 2>&1; then
+        echo "Error: bc is required." >&2
+        return 1
+    fi
+
+    expression=$(printf '%s' "$expression" | sed -E \
+        -e 's/\basin\(/asinf(/g' \
+        -e 's/\bacos\(/acosf(/g' \
+        -e 's/\batan\(/a(/g' \
+        -e 's/\bsin\(/s(/g' \
+        -e 's/\bcos\(/c(/g' \
+        -e 's/\btan\(/tanf(/g' \
+        -e 's/\blog\(/logten(/g' \
+        -e 's/\bln\(/l(/g' \
+        -e 's/\bexp\(/e(/g' \
+        -e 's/\bpi\b/(4*a(1))/g')
+
+    local functions='
+        define tanf(x) {
+            return (s(x) / c(x))
+        }
+
+        define asinf(x) {
+            if (x == 1) return (2*a(1))
+            if (x == -1) return (-2*a(1))
+            return (a(x / sqrt(1 - x*x)))
+        }
+
+        define acosf(x) {
+            return (2*a(1) - asinf(x))
+        }
+
+        define logten(x) {
+            return (l(x) / l(10))
+        }
+    '
+
+    printf 'scale=10\n%s\n%s\n' "$functions" "$expression" |
+        bc -l |
+        sed -E 's/(\.[0-9]*[1-9])0+$/\1/; s/\.0+$//'
+}
